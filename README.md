@@ -2,7 +2,7 @@
 
 <img src=https://statics3.seeedstudio.com/seeed/img/2016-08/5dxWtS1rxWLzukUaHBvGoIG9.jpg width=300><img src=https://statics3.seeedstudio.com/seeed/img/2016-08/3EmTCa2USbPnqZszQNngy8ss.jpg width=300>
 
-[Grove - Gesture（PAJ7620U2](https://www.seeedstudio.com/s/Grove-Gesture（PAJ7620U2）-p-2463.html)
+[Grove - Gesture（PAJ7620U2)](https://www.seeedstudio.com/s/Grove-Gesture（PAJ7620U2）-p-2463.html)
 
 **Description**
 
