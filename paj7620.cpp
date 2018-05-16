@@ -387,7 +387,32 @@ uint8_t paj7620Init(void)
 	{
 		paj7620WriteReg(initRegisterArray[i][0], initRegisterArray[i][1]);
 	}
-	
+		
+	/**
+	 * Setting normal mode or gaming mode at BANK1 register 0x65/0x66 R_IDLE_TIME[15:0]
+	 * T = 256/System CLK = 32us, 
+	 * Ex:
+	 * Far Mode: 1 report time = (77+R_IDLE_TIME)T
+	 * Report rate 120 fps:
+	 * R_IDLE_TIME=1/(120*T)-77=183
+	 * 
+	 * Report rate 240 fps:
+	 * R_IDLE_TIME=1/(240*T)-77=53
+	 * 
+	 * Near Mode: 1 report time = (112+R_IDLE_TIME)T
+	 * 
+	 * Report rate 120 fps:
+	 * R_IDLE_TIME=1/(120*T)-120=148
+	 * 
+	 * Report rate 240 fps:
+	 * R_IDLE_TIME=1/(240*T)-112=18
+	 * 
+	 */	
+	Serial.println("Set up gaming mode.");
+	paj7620SelectBank(BANK1);  //gesture flage reg in Bank1
+	// paj7620WriteReg(0x65, 0xB7); // far mode 120 fps
+	paj7620WriteReg(0x65, 0x12);  // near mode 240 fps
+
 	paj7620SelectBank(BANK0);  //gesture flage reg in Bank0
 	
 	Serial.println("Paj7620 initialize register finished.");
