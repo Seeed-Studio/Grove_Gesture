@@ -1,33 +1,33 @@
 /*
- * paj7620.h
- * A library for Grove-Guesture 1.0
- *
- * Copyright (c) 2015 seeed technology inc.
- * Website    : www.seeed.cc
- * Author     : Wuruibin & Xiangnan
- * Modified Time: June 2015
- *
- * The MIT License (MIT)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
- 
+    paj7620.h
+    A library for Grove-Guesture 1.0
+
+    Copyright (c) 2015 seeed technology inc.
+    Website    : www.seeed.cc
+    Author     : Wuruibin & Xiangnan
+    Modified Time: June 2015
+
+    The MIT License (MIT)
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+*/
+
 
 #ifndef __PAJ7620_H__
 #define __PAJ7620_H__
@@ -81,8 +81,8 @@
 #define PAJ7620_DISABLE		PAJ7620_VAL(0,0)
 
 typedef enum {
-	BANK0 = 0,
-	BANK1,		
+    BANK0 = 0,
+    BANK1,
 } bank_e;
 
 #define GES_RIGHT_FLAG				PAJ7620_VAL(1,0)
@@ -96,7 +96,7 @@ typedef enum {
 #define GES_WAVE_FLAG				PAJ7620_VAL(1,0)
 
 /*
-enum {
+    enum {
 	// REGISTER 0
 	GES_RIGHT_FLAG			 = BIT(0),
 	GES_LEFT_FLAG			 = BIT(1),
@@ -107,8 +107,8 @@ enum {
 	GES_CLOCKWISE_FLAG		 = BIT(6),
 	GES_COUNT_CLOCKWISE_FLAG = BIT(7),
 	//REGISTER 1
-	GES_WAVE_FLAG		= BIT(0),	
-};
+	GES_WAVE_FLAG		= BIT(0),
+    };
 */
 
 
