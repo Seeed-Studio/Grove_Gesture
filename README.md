@@ -1,4 +1,4 @@
-# Gesture_PAJ7620
+# Gesture_PAJ7620  [![Build Status](https://travis-ci.com/Seeed-Studio/Gesture_PAJ7620.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Gesture_PAJ7620)
 
 <img src=https://statics3.seeedstudio.com/seeed/img/2016-08/5dxWtS1rxWLzukUaHBvGoIG9.jpg width=300><img src=https://statics3.seeedstudio.com/seeed/img/2016-08/3EmTCa2USbPnqZszQNngy8ss.jpg width=300>
 
