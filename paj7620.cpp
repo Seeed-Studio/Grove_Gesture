@@ -34,7 +34,12 @@
 
 // PAJ7620U2_20140305.asc
 /* Registers' initialization data */
+#if defined(__AVR__) || defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
+#define PROGMEM_COMPATIBLE
 const unsigned short initRegisterArray[] PROGMEM = {
+#else
+const unsigned short initRegisterArray[] = {
+#endif
 		// Initial Gesture // this is atleast 440 bytes
 		0xEF00,
 		0x3229,
@@ -373,7 +378,11 @@ uint8_t paj7620Init(void) {
 
 	for (i = 0; i < INIT_REG_ARRAY_SIZE; i++)
 	{
+        #ifdef PROGMEM_COMPATIBLE
 		uint16_t word = pgm_read_word(&initRegisterArray[i]);
+        #else
+        uint16_t word = initRegisterArray[i];
+        #endif
 		uint8_t high, low;
 		high = (word & 0xFF00) >> 8;
 		low = (word & 0x00FF);
