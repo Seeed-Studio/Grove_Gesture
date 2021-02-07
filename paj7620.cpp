@@ -41,7 +41,8 @@ const unsigned short initRegisterArray[] PROGMEM = {
 const unsigned short initRegisterArray[] = {
 #endif
 		// Initial Gesture // this is atleast 440 bytes
-		0xEF00,
+		// 0xABCD writes 0xCD to register 0xAB
+		0xEF00, //select bank 0
 		0x3229,
 		0x3301,
 		0x3400,
@@ -53,8 +54,8 @@ const unsigned short initRegisterArray[] = {
 		0x3A12,
 		0x3F00,
 		0x4002,
-		0x41FF,
-		0x4201,
+		0x41FF, //enable all gestures
+		0x4201, //enable wave gesture
 		0x462D,
 		0x470F,
 		0x483C,
@@ -81,14 +82,14 @@ const unsigned short initRegisterArray[] = {
 		0x66D9,
 		0x6703,
 		0x6801,
-		0x69C8,
+		0x69C8, //...high threshold?
 		0x6A40,
 		0x6D04,
 		0x6E00,
 		0x6F00,
 		0x7080,
 		0x7100,
-		0x7200,
+		0x7200, //operation enable?
 		0x7300,
 		0x74F0,
 		0x7500,
@@ -211,7 +212,7 @@ const unsigned short initRegisterArray[] = {
 		0x4140,
 		0x4200,
 		0x4330,
-		0x44A0,
+		0x44A0, //gain?
 		0x455C,
 		0x4600,
 		0x4700,
@@ -243,8 +244,8 @@ const unsigned short initRegisterArray[] = {
 		0x6600,
 		0x6797,
 		0x6801,
-		0x69CD,
-		0x6A01,
+		0x69CD, // high threshold?
+		0x6A01, // low threshold?
 		0x6BB0,
 		0x6C04,
 		0x6D2C,
@@ -316,24 +317,6 @@ uint8_t paj7620ReadReg(uint8_t addr, uint8_t qty, uint8_t data[]) {
     return 0;
 }
 
-/****************************************************************
-    Function Name: paj7620SelectBank
-    Description:  PAJ7620 select register bank
-    Parameters: BANK0, BANK1
-    Return: none
-****************************************************************/
-void paj7620SelectBank(bank_e bank) {
-    switch (bank) {
-        case BANK0:
-            paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, PAJ7620_BANK0);
-            break;
-        case BANK1:
-            paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, PAJ7620_BANK1);
-            break;
-        default:
-            break;
-    }
-}
 
 /****************************************************************
     Function Name: paj7620Init
@@ -341,29 +324,34 @@ void paj7620SelectBank(bank_e bank) {
     Parameters: none
     Return: error code; success: return 0
 ****************************************************************/
-uint8_t paj7620Init(void) {
+uint8_t paj7620Init(paj7620_init_mode mode) {
     //Near_normal_mode_V5_6.15mm_121017 for 940nm
     int i = 0;
     uint8_t error;
     uint8_t data0 = 0, data1 = 0;
     //wakeup the sensor
-    delayMicroseconds(700);	//Wait 700us for PAJ7620U2 to stabilize
+    delayMicroseconds(700);	//Wait for PAJ7620U2 to stabilize
 
     Wire.begin();
 
     Serial.println("INIT SENSOR...");
+    delayMicroseconds(10000);	//Wait for PAJ7620U2 to stabilize
 
-    paj7620SelectBank(BANK0);
-    paj7620SelectBank(BANK0);
+    paj7620WriteReg(PAJ7620_REGISTER_BANK_SEL, PAJ7620_BANK0);
+    Serial.println("bank select finish...");
+    delayMicroseconds(1000);	//Wait for PAJ7620U2 to stabilize
 
     error = paj7620ReadReg(0, 1, &data0);
     if (error) {
         return error;
     }
+    delayMicroseconds(1000);	//Wait for PAJ7620U2 to stabilize
+    Serial.println("readreg 0 finish...");
     error = paj7620ReadReg(1, 1, &data1);
     if (error) {
         return error;
     }
+    delayMicroseconds(1000);	//Wait for PAJ7620U2 to stabilize
     Serial.print("Addr0 =");
     Serial.print(data0, HEX);
     Serial.print(",  Addr1 =");
@@ -371,29 +359,29 @@ uint8_t paj7620Init(void) {
 
     if ((data0 != 0x20) || (data1 != 0x76)) {
         return 0xff;
-    }
-    if (data0 == 0x20) {
+    } else {
         Serial.println("wake-up finish.");
     }
+    delayMicroseconds(1000);	//Wait for PAJ7620U2 to stabilize
 
-	for (i = 0; i < INIT_REG_ARRAY_SIZE; i++)
-	{
-        #ifdef PROGMEM_COMPATIBLE
-		uint16_t word = pgm_read_word(&initRegisterArray[i]);
-        #else
-        uint16_t word = initRegisterArray[i];
-        #endif
-		uint8_t high, low;
-		high = (word & 0xFF00) >> 8;
-		low = (word & 0x00FF);
-#ifdef debug
-		Serial.print("Line :");
-		Serial.print(i);
-		Serial.print(" data: 0x");
-		Serial.print(high, HEX);
-		Serial.println(low, HEX);
+    for (i = 0; i < INIT_REG_ARRAY_SIZE; i++) {
+#ifdef PROGMEM_COMPATIBLE
+      uint16_t word = pgm_read_word(&initRegisterArray[i]);
+#else
+      uint16_t word = initRegisterArray[i];
 #endif
-		paj7620WriteReg(high, low);
+      uint8_t reg;
+      uint8_t val;
+      reg = (word & 0xFF00) >> 8;
+      val = (word & 0x00FF);
+#ifdef debug
+      Serial.print("Line :");
+      Serial.print(i);
+      Serial.print(" data: 0x");
+      Serial.print(reg, HEX);
+      Serial.println(val, HEX);
+#endif
+      paj7620WriteReg(reg, val);
     }
 
     /**
@@ -416,13 +404,30 @@ uint8_t paj7620Init(void) {
         R_IDLE_TIME=1/(240*T)-112=18
 
     */
-    Serial.println("Set up gaming mode.");
-    paj7620SelectBank(BANK1);  //gesture flage reg in Bank1
-    // paj7620WriteReg(0x65, 0xB7); // far mode 120 fps
-    paj7620WriteReg(0x65, 0x12);  // near mode 240 fps
+    paj7620WriteReg(PAJ7620_REGISTER_BANK_SEL, PAJ7620_BANK1);
+    if( mode == FAR_SLOW_MODE ){
+      Serial.println("Set up far mode, 120fps.");
+      paj7620WriteReg(0x65, 0xB7); // far mode 120 fps
+    } else {
+      Serial.println("Set up gaming mode, 240fps.");
+      paj7620WriteReg(0x65, 0x12);  // near mode 240 fps
+    }
 
-    paj7620SelectBank(BANK0);  //gesture flage reg in Bank0
+    paj7620WriteReg(PAJ7620_REGISTER_BANK_SEL, PAJ7620_BANK0);
 
     Serial.println("Paj7620 initialize register finished.");
     return 0;
+}
+uint16_t paj7620ReadGesture(){ 
+  // Read Bank_0_Reg_0x43/0x44 for gesture result.
+  uint8_t data0 = 0;
+  uint8_t error0 = 0;
+  uint8_t data1 = 0;
+  uint8_t error1 = 0;
+  error0 = paj7620ReadReg(0x43, 1, &data0);
+  error1 = paj7620ReadReg(0x44, 1, &data1);
+  if( error0 || error1 ){
+    return 0xffff;
+  }
+  return (data1 << 8 )| data0;
 }
