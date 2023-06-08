@@ -60,75 +60,75 @@ void loop() {
     error = paj7620ReadReg(0x43, 1, &data);				// Read Bank_0_Reg_0x43/0x44 for gesture result.
     if (!error) {
         switch (data) {								// When different gestures be detected, the variable 'data' will be set to different values by paj7620ReadReg(0x43, 1, &data).
-            case GES_RIGHT_FLAG:
+            case PAJ7620_VAL(RIGHT):
                 delay(GES_ENTRY_TIME);
                 paj7620ReadReg(0x43, 1, &data);
-                if (data == GES_FORWARD_FLAG) {
+                if (data == PAJ7620_VAL(PUSH)) {
                     Serial.println("Forward");
                     delay(GES_QUIT_TIME);
-                } else if (data == GES_BACKWARD_FLAG) {
+                } else if (data == PAJ7620_VAL(POLL)) {
                     Serial.println("Backward");
                     delay(GES_QUIT_TIME);
                 } else {
                     Serial.println("Right");
                 }
                 break;
-            case GES_LEFT_FLAG:
+            case PAJ7620_VAL(LEFT):
                 delay(GES_ENTRY_TIME);
                 paj7620ReadReg(0x43, 1, &data);
-                if (data == GES_FORWARD_FLAG) {
+                if (data == PAJ7620_VAL(PUSH)) {
                     Serial.println("Forward");
                     delay(GES_QUIT_TIME);
-                } else if (data == GES_BACKWARD_FLAG) {
+                } else if (data == PAJ7620_VAL(POLL)) {
                     Serial.println("Backward");
                     delay(GES_QUIT_TIME);
                 } else {
                     Serial.println("Left");
                 }
                 break;
-            case GES_UP_FLAG:
+            case PAJ7620_VAL(UP):
                 delay(GES_ENTRY_TIME);
                 paj7620ReadReg(0x43, 1, &data);
-                if (data == GES_FORWARD_FLAG) {
+                if (data == PAJ7620_VAL(PUSH)) {
                     Serial.println("Forward");
                     delay(GES_QUIT_TIME);
-                } else if (data == GES_BACKWARD_FLAG) {
+                } else if (data == PAJ7620_VAL(POLL)) {
                     Serial.println("Backward");
                     delay(GES_QUIT_TIME);
                 } else {
                     Serial.println("Up");
                 }
                 break;
-            case GES_DOWN_FLAG:
+            case PAJ7620_VAL(DOWN):
                 delay(GES_ENTRY_TIME);
                 paj7620ReadReg(0x43, 1, &data);
-                if (data == GES_FORWARD_FLAG) {
+                if (data == PAJ7620_VAL(PUSH)) {
                     Serial.println("Forward");
                     delay(GES_QUIT_TIME);
-                } else if (data == GES_BACKWARD_FLAG) {
+                } else if (data == PAJ7620_VAL(POLL)) {
                     Serial.println("Backward");
                     delay(GES_QUIT_TIME);
                 } else {
                     Serial.println("Down");
                 }
                 break;
-            case GES_FORWARD_FLAG:
+            case PAJ7620_VAL(PUSH):
                 Serial.println("Forward");
                 delay(GES_QUIT_TIME);
                 break;
-            case GES_BACKWARD_FLAG:
+            case PAJ7620_VAL(POLL):
                 Serial.println("Backward");
                 delay(GES_QUIT_TIME);
                 break;
-            case GES_CLOCKWISE_FLAG:
+            case PAJ7620_VAL(CLOCKWISE):
                 Serial.println("Clockwise");
                 break;
-            case GES_COUNT_CLOCKWISE_FLAG:
+            case PAJ7620_VAL(ANTI_CLOCKWISE):
                 Serial.println("anti-clockwise");
                 break;
             default:
                 paj7620ReadReg(0x44, 1, &data1);
-                if (data1 == GES_WAVE_FLAG) {
+                if (data1 == PAJ7620_VAL(WAVE-8)) {
                     Serial.println("wave");
                 }
                 break;

@@ -1,6 +1,6 @@
 /*
     paj7620.cpp
-    A library for Grove-Guesture 1.0
+    A library for Grove-Gesture 1.0
 
     Copyright (c) 2015 seeed technology inc.
     Website    : www.seeed.cc
@@ -317,25 +317,6 @@ uint8_t paj7620ReadReg(uint8_t addr, uint8_t qty, uint8_t data[]) {
 }
 
 /****************************************************************
-    Function Name: paj7620SelectBank
-    Description:  PAJ7620 select register bank
-    Parameters: BANK0, BANK1
-    Return: none
-****************************************************************/
-void paj7620SelectBank(bank_e bank) {
-    switch (bank) {
-        case BANK0:
-            paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, PAJ7620_BANK0);
-            break;
-        case BANK1:
-            paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, PAJ7620_BANK1);
-            break;
-        default:
-            break;
-    }
-}
-
-/****************************************************************
     Function Name: paj7620Init
     Description:  PAJ7620 REG INIT
     Parameters: none
@@ -350,11 +331,9 @@ uint8_t paj7620Init(void) {
     delayMicroseconds(700);	//Wait 700us for PAJ7620U2 to stabilize
 
     Wire.begin();
-
     Serial.println("INIT SENSOR...");
-
-    paj7620SelectBank(BANK0);
-    paj7620SelectBank(BANK0);
+    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);
+    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);
 
     error = paj7620ReadReg(0, 1, &data0);
     if (error) {
@@ -372,9 +351,7 @@ uint8_t paj7620Init(void) {
     if ((data0 != 0x20) || (data1 != 0x76)) {
         return 0xff;
     }
-    if (data0 == 0x20) {
-        Serial.println("wake-up finish.");
-    }
+    Serial.println("wake-up finish.");
 
 	for (i = 0; i < INIT_REG_ARRAY_SIZE; i++)
 	{
@@ -403,25 +380,18 @@ uint8_t paj7620Init(void) {
         Far Mode: 1 report time = (77+R_IDLE_TIME)T
         Report rate 120 fps:
         R_IDLE_TIME=1/(120*T)-77=183
-
         Report rate 240 fps:
         R_IDLE_TIME=1/(240*T)-77=53
-
         Near Mode: 1 report time = (112+R_IDLE_TIME)T
-
         Report rate 120 fps:
-        R_IDLE_TIME=1/(120*T)-120=148
-
+        R_IDLE_TIME=1/(120*T)-112=148
         Report rate 240 fps:
         R_IDLE_TIME=1/(240*T)-112=18
-
     */
-    Serial.println("Set up gaming mode.");
-    paj7620SelectBank(BANK1);  //gesture flage reg in Bank1
+    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 1);  //gesture flage reg in Bank1
     // paj7620WriteReg(0x65, 0xB7); // far mode 120 fps
     paj7620WriteReg(0x65, 0x12);  // near mode 240 fps
-
-    paj7620SelectBank(BANK0);  //gesture flage reg in Bank0
+    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);  //gesture flage reg in Bank0
 
     Serial.println("Paj7620 initialize register finished.");
     return 0;
