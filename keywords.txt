@@ -7,15 +7,14 @@
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
-
+paj7620 KEYWORD1
+paj7620_gesture_t KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-paj7620Init	KEYWORD2
-paj7620WriteReg	KEYWORD2
-paj7620ReadReg	KEYWORD2
-paj7620SelectBank	KEYWORD2
+init      KEYWORD2
+getResult KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
