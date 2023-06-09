@@ -5,7 +5,7 @@
     Copyright (c) 2015 seeed technology inc.
     Website    : www.seeed.cc
     Author     : Wuruibin & Xiangnan
-    Modified Time: June 2015
+    Modified Time: June 2023
 
     The MIT License (MIT)
 
@@ -35,27 +35,22 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#define PAJ7620_I2C_ADDR	0x73
 // REGISTER DESCRIPTION
 #define PAJ7620_VAL(maskbit)		( 1 << maskbit )
-#define PAJ7620_ADDR_BASE				0x00
+#define PAJ7620_REG_BANK_SEL  0xEF
+#define PAJ7620_REG_RESULT_L  0x43
+#define PAJ7620_REG_RESULT_H  0x44
 
-// REGISTER BANK SELECT
-#define PAJ7620_REGITER_BANK_SEL	0xEF	//W
-
-// DEVICE ID
-#define PAJ7620_ID  0x73
-
+#define DebounceT 300 //debounce time, unit:ms
 #define PAJ7620_GESTURE_COUNT 9
-typedef enum PAJ7620_GESTURE {
-    RIGHT,LEFT,UP,DOWN,PUSH,POLL,CLOCKWISE,ANTI_CLOCKWISE,WAVE
+typedef enum paj7620_gesture_type {
+    UP,DOWN,LEFT,RIGHT,PUSH,POLL,CLOCKWISE,ANTI_CLOCKWISE,WAVE
 } paj7620_gesture_t;
 
-enum paj7620_report_mode {
-    FAR_240FPS = 0,
-    FAR_120FPS,
-    NEAR_240FPS, /* Default */
-    NEAR_120FPS
-};
+typedef enum paj7620_report_mode {
+    FAR_240FPS, FAR_120FPS, NEAR_240FPS, NEAR_120FPS
+}paj7620_report_t;
 
 #define INIT_REG_ARRAY_SIZE (sizeof(initRegisterArray)/sizeof(initRegisterArray[0]))
 

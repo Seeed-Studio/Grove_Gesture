@@ -27,8 +27,7 @@
     THE SOFTWARE.
 */
 
-#include <Wire.h>
-#include "paj7620.h"
+#include "Gesture.h"
 
 /*
     Notice: When you want to recognize the Forward/Backward gestures, your gestures' reaction time must less than GES_ENTRY_TIME(0.8s).
@@ -38,100 +37,93 @@
 #define GES_ENTRY_TIME			800				// When you want to recognize the Forward/Backward gestures, your gestures' reaction time must less than GES_ENTRY_TIME(0.8s). 
 #define GES_QUIT_TIME			1000
 
+paj7620 Gesture;
 void setup() {
-    uint8_t error = 0;
-
     Serial.begin(9600);
     Serial.println("\nPAJ7620U2 TEST DEMO: Recognize 9 gestures.");
-
-    error = paj7620Init();			// initialize Paj7620 registers
-    if (error) {
-        Serial.print("INIT ERROR,CODE:");
-        Serial.println(error);
+    if(Gesture.init()) {
+        Serial.println("PAJ7620U2 initialization failed");
     } else {
-        Serial.println("INIT OK");
+        Serial.println("PAJ7620U2 initialization success");
     }
     Serial.println("Please input your gestures:\n");
 }
 
 void loop() {
-    uint8_t data = 0, data1 = 0, error;
-
-    error = paj7620ReadReg(0x43, 1, &data);				// Read Bank_0_Reg_0x43/0x44 for gesture result.
-    if (!error) {
-        switch (data) {								// When different gestures be detected, the variable 'data' will be set to different values by paj7620ReadReg(0x43, 1, &data).
-            case PAJ7620_VAL(RIGHT):
-                delay(GES_ENTRY_TIME);
-                paj7620ReadReg(0x43, 1, &data);
-                if (data == PAJ7620_VAL(PUSH)) {
-                    Serial.println("Forward");
-                    delay(GES_QUIT_TIME);
-                } else if (data == PAJ7620_VAL(POLL)) {
-                    Serial.println("Backward");
-                    delay(GES_QUIT_TIME);
-                } else {
-                    Serial.println("Right");
-                }
-                break;
-            case PAJ7620_VAL(LEFT):
-                delay(GES_ENTRY_TIME);
-                paj7620ReadReg(0x43, 1, &data);
-                if (data == PAJ7620_VAL(PUSH)) {
-                    Serial.println("Forward");
-                    delay(GES_QUIT_TIME);
-                } else if (data == PAJ7620_VAL(POLL)) {
-                    Serial.println("Backward");
-                    delay(GES_QUIT_TIME);
-                } else {
-                    Serial.println("Left");
-                }
-                break;
-            case PAJ7620_VAL(UP):
-                delay(GES_ENTRY_TIME);
-                paj7620ReadReg(0x43, 1, &data);
-                if (data == PAJ7620_VAL(PUSH)) {
-                    Serial.println("Forward");
-                    delay(GES_QUIT_TIME);
-                } else if (data == PAJ7620_VAL(POLL)) {
-                    Serial.println("Backward");
-                    delay(GES_QUIT_TIME);
-                } else {
-                    Serial.println("Up");
-                }
-                break;
-            case PAJ7620_VAL(DOWN):
-                delay(GES_ENTRY_TIME);
-                paj7620ReadReg(0x43, 1, &data);
-                if (data == PAJ7620_VAL(PUSH)) {
-                    Serial.println("Forward");
-                    delay(GES_QUIT_TIME);
-                } else if (data == PAJ7620_VAL(POLL)) {
-                    Serial.println("Backward");
-                    delay(GES_QUIT_TIME);
-                } else {
-                    Serial.println("Down");
-                }
-                break;
-            case PAJ7620_VAL(PUSH):
+    paj7620_gesture_t gesture;
+    if (Gesture.getResult(&gesture)) {
+        switch (gesture) {
+        case UP:
+            delay(GES_ENTRY_TIME);
+            Gesture.getResult(&gesture);
+            if (gesture == PUSH) {
                 Serial.println("Forward");
                 delay(GES_QUIT_TIME);
-                break;
-            case PAJ7620_VAL(POLL):
+            } else if (gesture == POLL) {
                 Serial.println("Backward");
                 delay(GES_QUIT_TIME);
-                break;
-            case PAJ7620_VAL(CLOCKWISE):
-                Serial.println("Clockwise");
-                break;
-            case PAJ7620_VAL(ANTI_CLOCKWISE):
-                Serial.println("anti-clockwise");
-                break;
-            default:
-                paj7620ReadReg(0x44, 1, &data1);
-                if (data1 == PAJ7620_VAL(WAVE-8)) {
-                    Serial.println("wave");
-                }
-                break;
+            } else {
+                Serial.println("Up");
+            }
+            break;
+        case DOWN:
+            delay(GES_ENTRY_TIME);
+            Gesture.getResult(&gesture);
+            if (gesture == PUSH) {
+                Serial.println("Forward");
+                delay(GES_QUIT_TIME);
+            } else if (gesture == POLL) {
+                Serial.println("Backward");
+                delay(GES_QUIT_TIME);
+            } else {
+                Serial.println("Down");
+            }
+            break;
+        case LEFT:
+            delay(GES_ENTRY_TIME);
+            Gesture.getResult(&gesture);
+            if (gesture == PUSH) {
+                Serial.println("Forward");
+                delay(GES_QUIT_TIME);
+            } else if (gesture == POLL) {
+                Serial.println("Backward");
+                delay(GES_QUIT_TIME);
+            } else {
+                Serial.println("Left");
+            }
+            break;
+        case RIGHT:
+            delay(GES_ENTRY_TIME);
+            Gesture.getResult(&gesture);
+            if (gesture == PUSH) {
+                Serial.println("Forward");
+                delay(GES_QUIT_TIME);
+            } else if (gesture == POLL) {
+                Serial.println("Backward");
+                delay(GES_QUIT_TIME);
+            } else {
+                Serial.println("Right");
+            }
+            break;
+        case PUSH:
+            Serial.println("Forward");
+            delay(GES_QUIT_TIME);
+            break;
+        case POLL:
+            Serial.println("Backward");
+            delay(GES_QUIT_TIME);
+            break;
+        case CLOCKWISE:
+            Serial.println("Clockwise");
+            break;
+        case ANTI_CLOCKWISE:
+            Serial.println("anti-clockwise");
+            break;
+        case WAVE:
+            Serial.println("wave");
+            break;
+        default:
+            break;
         }
     }
     delay(100);

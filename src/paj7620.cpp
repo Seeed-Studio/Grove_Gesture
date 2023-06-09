@@ -28,6 +28,7 @@
     THE SOFTWARE.
 */
 
+/*
 #include "paj7620.h"
 
 #if defined(__AVR__) || defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
@@ -59,7 +60,7 @@ const uint8_t initRegisterArray[][2] = {
 ****************************************************************/
 uint8_t paj7620WriteReg(uint8_t addr, uint8_t cmd) {
     char i = 1;
-    Wire.beginTransmission(PAJ7620_ID);		// start transmission to device
+    Wire.beginTransmission(PAJ7620_I2C_ADDR);		// start transmission to device
     //write cmd
     Wire.write(addr);						// send register address
     Wire.write(cmd);						// send value to write
@@ -80,7 +81,7 @@ uint8_t paj7620WriteReg(uint8_t addr, uint8_t cmd) {
 ****************************************************************/
 uint8_t paj7620ReadReg(uint8_t addr, uint8_t qty, uint8_t data[]) {
     uint8_t error;
-    Wire.beginTransmission(PAJ7620_ID);
+    Wire.beginTransmission(PAJ7620_I2C_ADDR);
     Wire.write(addr);
     error = Wire.endTransmission();
 
@@ -89,7 +90,7 @@ uint8_t paj7620ReadReg(uint8_t addr, uint8_t qty, uint8_t data[]) {
         return error; //return error code
     }
 
-    Wire.requestFrom((int)PAJ7620_ID, (int)qty);
+    Wire.requestFrom((int)PAJ7620_I2C_ADDR, (int)qty);
 
     while (Wire.available()) {
         *data = Wire.read();
@@ -122,8 +123,8 @@ uint8_t paj7620Init(void) {
 
     Wire.begin();
     Serial.println("INIT SENSOR...");
-    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);
-    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);
+    paj7620WriteReg(PAJ7620_REG_BANK_SEL, 0);
+    paj7620WriteReg(PAJ7620_REG_BANK_SEL, 0);
 
     paj7620ReadReg(0, 1, &data0);
     paj7620ReadReg(1, 1, &data1);
@@ -144,7 +145,7 @@ uint8_t paj7620Init(void) {
 	}
 
 	setReportMode(NEAR_240FPS);
-    paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);  //gesture flage reg in Bank0
+    paj7620WriteReg(PAJ7620_REG_BANK_SEL, 0);  //gesture flage reg in Bank0
 
     Serial.println("Paj7620 initialize register finished.");
     return 0;
@@ -156,7 +157,7 @@ uint8_t paj7620Init(void) {
 */
 void setReportMode(uint8_t reportMode) {
 	uint8_t regIdleTime = 0;
-	paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 1);  //gesture flage reg in Bank1
+	paj7620WriteReg(PAJ7620_REG_BANK_SEL, 1);  //gesture flage reg in Bank1
 	switch (reportMode) {
 	// Far Mode: 1 report time = (77 + R_IDLE_TIME) * T
     case FAR_240FPS:
@@ -176,5 +177,5 @@ void setReportMode(uint8_t reportMode) {
         break;
     }
 	paj7620WriteReg(0x65, regIdleTime);
-	paj7620WriteReg(PAJ7620_REGITER_BANK_SEL, 0);  //gesture flage reg in Bank0
+	paj7620WriteReg(PAJ7620_REG_BANK_SEL, 0);  //gesture flage reg in Bank0
 }
