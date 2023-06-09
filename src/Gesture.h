@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "paj7620.h"
-// #include "pag7660.h"
+#include "pag7660.h"
 
 class Pixart_Gesture
 {
@@ -31,21 +31,21 @@ class paj7620 : public Pixart_Gesture
 };
 
 
-// class pag7660 : public Pixart_Gesture
-// {
-//    public:
-//       pag7660(int mode = GESTURE_COMBINED_MODE) {
-//          i2c_addr = PAG7660_I2C_ADDR;
-//          gestureMode = mode;
-//       };
-//       bool init();
-//       bool getResult(gesture_out_t& out);
+class pag7660 : public Pixart_Gesture
+{
+   public:
+      pag7660(int mode = GESTURE_COMBINED_MODE) {
+         i2c_addr = PAG7660_I2C_ADDR;
+         gestureMode = mode;
+      };
+      bool init();
+      bool getResult(gesture_out_t& out);
 
-//       int getGestureMode();
-//       int nextGestureMode();
+      int getGestureMode();
+      int nextGestureMode();
 
-//    private:
-//       uint8_t gestureMode;
-//       bool checkReady();
-//       void clearReady();
-// };
+   private:
+      uint8_t gestureMode;
+      bool checkReady();
+      void clearReady();
+};

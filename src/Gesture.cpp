@@ -63,20 +63,15 @@ bool paj7620::init()
 {   
     delay(10);
     Wire.begin();
-    readReg(0x00);
+    writeReg(0xff, 0x00);  //wakeup
     delay(50);
 
     if((readReg(0x00) != 0x20) || (readReg(0x01) != 0x76))
         return false;
-    // if(readReg(0x02) == 0x01) return false;
-    // writeReg(0xff, 0x00);  //wakeup
     delay(10);
     for(uint8_t i = 0; i < INIT_REG_ARRAY_SIZE; i++)
         writeReg(initRegisterArray[i][0], initRegisterArray[i][1]);
     
-    // delay(DebounceT);  //debounce, clean data
-    // readReg(PAJ7620_REG_RESULT_H);
-    // readReg(PAJ7620_REG_RESULT_L);
     setReportMode(NEAR_240FPS);
     return true;
 }
@@ -126,4 +121,69 @@ bool paj7620::setReportMode(uint8_t reportMode) {
 	writeReg(0x65, regIdleTime);
 	writeReg(PAJ7620_REG_BANK_SEL, 0);  // reg in Bank0
     return true;
+}
+
+
+bool pag7660::init() {
+    const uint8_t regs[][2] = {
+        { 0x10, 0x04 },        // Set operation to gesture mode
+        { 0x22, gestureMode }, // Set gesture mode
+        { 0x0A, 0x01 },        // enable cpu
+    };
+    uint16_t id;
+    id = (readReg(1) << 8) | readReg(0);
+    if (id != PAG7660_ID)
+        return false;
+    
+    for (int i = 0; i < sizeof(regs)/2; i++) {
+        writeReg(regs[i][0], regs[i][1]);
+        delay(10);
+    }
+    return true;
+}
+
+int pag7660::getGestureMode() {
+    return gestureMode;
+}
+
+int pag7660::nextGestureMode() {
+    /* Determine next gesture mode */
+    switch (gestureMode) {
+    case GESTURE_THUMB_MODE:
+        gestureMode = GESTURE_CURSOR_MODE;
+        break;
+    case GESTURE_CURSOR_MODE:
+        gestureMode = GESTURE_COMBINED_MODE;
+        break;
+    case GESTURE_COMBINED_MODE:
+        gestureMode = GESTURE_THUMB_MODE;
+        break;
+    default:
+        gestureMode = GESTURE_COMBINED_MODE;
+        break;
+    }
+    /* Switch gesture mode */
+    writeReg(0x22, gestureMode);
+    return gestureMode;
+}
+
+bool pag7660::getGestureOutput(gesture_out_t& out) {
+    /* Check frame ready */
+    if (!checkReady())
+        return false;
+    /* Read gesture output */
+    gesture_reg_out_t reg;
+    readRegs(0x3c, (uint8_t *)&reg, sizeof(reg));
+    out = toGesture(reg);
+    /* Clear frame ready */
+    clearReady();
+    return true;
+}
+
+bool pag7660::checkReady() {
+    return readReg(0x04) & 0x02;
+}
+
+void pag7660::clearReady() {
+    writeReg(0x04, 0x00);
 }
