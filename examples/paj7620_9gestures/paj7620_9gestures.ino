@@ -50,16 +50,16 @@ void setup() {
 }
 
 void loop() {
-    paj7620_gesture_t gesture;
-    if (Gesture.getResult(&gesture)) {
-        switch (gesture) {
+    paj7620_gesture_t result;
+    if (Gesture.getResult(result)) {
+        switch (result) {
         case UP:
             delay(GES_ENTRY_TIME);
-            Gesture.getResult(&gesture);
-            if (gesture == PUSH) {
+            Gesture.getResult(result);
+            if (result == PUSH) {
                 Serial.println("Forward");
                 delay(GES_QUIT_TIME);
-            } else if (gesture == POLL) {
+            } else if (result == POLL) {
                 Serial.println("Backward");
                 delay(GES_QUIT_TIME);
             } else {
@@ -68,11 +68,11 @@ void loop() {
             break;
         case DOWN:
             delay(GES_ENTRY_TIME);
-            Gesture.getResult(&gesture);
-            if (gesture == PUSH) {
+            Gesture.getResult(result);
+            if (result == PUSH) {
                 Serial.println("Forward");
                 delay(GES_QUIT_TIME);
-            } else if (gesture == POLL) {
+            } else if (result == POLL) {
                 Serial.println("Backward");
                 delay(GES_QUIT_TIME);
             } else {
@@ -81,11 +81,11 @@ void loop() {
             break;
         case LEFT:
             delay(GES_ENTRY_TIME);
-            Gesture.getResult(&gesture);
-            if (gesture == PUSH) {
+            Gesture.getResult(result);
+            if (result == PUSH) {
                 Serial.println("Forward");
                 delay(GES_QUIT_TIME);
-            } else if (gesture == POLL) {
+            } else if (result == POLL) {
                 Serial.println("Backward");
                 delay(GES_QUIT_TIME);
             } else {
@@ -94,11 +94,11 @@ void loop() {
             break;
         case RIGHT:
             delay(GES_ENTRY_TIME);
-            Gesture.getResult(&gesture);
-            if (gesture == PUSH) {
+            Gesture.getResult(result);
+            if (result == PUSH) {
                 Serial.println("Forward");
                 delay(GES_QUIT_TIME);
-            } else if (gesture == POLL) {
+            } else if (result == POLL) {
                 Serial.println("Backward");
                 delay(GES_QUIT_TIME);
             } else {

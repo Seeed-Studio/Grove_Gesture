@@ -7,11 +7,9 @@
 class Pixart_Gesture
 {
    public:
-      Pixart_Gesture();
       virtual bool init();
-      virtual bool getResult();
 
-   private:
+   protected:
       uint8_t i2c_addr;
       void writeReg(uint8_t addr, uint8_t value);
       void readRegs(uint8_t addr, uint8_t *values, int size);
@@ -22,12 +20,14 @@ class Pixart_Gesture
 class paj7620 : public Pixart_Gesture
 {
    public:
-      paj7620(){ i2c_addr = PAJ7620_I2C_ADDR; }
+      paj7620() { 
+         i2c_addr = PAJ7620_I2C_ADDR; 
+      };
       bool init();
       bool getResult(paj7620_gesture_t& out);
 
    private:
-      bool setReportMode();
+      bool setReportMode(uint8_t reportMode);
 };
 
 
@@ -35,6 +35,7 @@ class paj7620 : public Pixart_Gesture
 // {
 //    public:
 //       pag7660(int mode = GESTURE_COMBINED_MODE) {
+//          i2c_addr = PAG7660_I2C_ADDR;
 //          gestureMode = mode;
 //       };
 //       bool init();

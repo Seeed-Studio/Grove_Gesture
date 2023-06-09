@@ -51,7 +51,6 @@ void Pixart_Gesture::readRegs(uint8_t addr, uint8_t *values, int size) {
         *values = Wire.read();
         values++;
     }
-    return 0;
 }
 
 uint8_t Pixart_Gesture::readReg(uint8_t addr) {
@@ -87,10 +86,10 @@ bool paj7620::getResult(paj7620_gesture_t& out)
     uint16_t gesture_code;
     gesture_code = (readReg(PAJ7620_REG_RESULT_H)<<8) + readReg(PAJ7620_REG_RESULT_L);
     if (gesture_code == 0) return false;
-    for (paj7620_gesture_t i = RIGHT; i < PAJ7620_GESTURE_COUNT; i++)
+    for (uint8_t i = UP; i < PAJ7620_GESTURE_COUNT; i++)
     {
         if (gesture_code == (1 << i)) {
-            out = i;
+            out = (paj7620_gesture_t)i;
             readReg(PAJ7620_REG_RESULT_H);
             readReg(PAJ7620_REG_RESULT_L);
             return true;
@@ -122,8 +121,9 @@ bool paj7620::setReportMode(uint8_t reportMode) {
         regIdleTime = 148; // 1/(120*T) - 112
         break;
     default:
-        break;
+        return false;
     }
 	writeReg(0x65, regIdleTime);
 	writeReg(PAJ7620_REG_BANK_SEL, 0);  // reg in Bank0
+    return true;
 }
