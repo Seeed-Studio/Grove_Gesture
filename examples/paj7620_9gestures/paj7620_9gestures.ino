@@ -2,7 +2,7 @@
     Copyright (c) 2015 seeed technology inc.
     Website    : www.seeed.cc
     Author     : Wuruibin
-    Modified Time: June 2015
+    Modified Time: June 2023
     Description: This demo can recognize 9 gestures and output the result, including move up, move down, move left, move right,
   				move forward, move backward, circle-clockwise, circle-counter clockwise, and wave.
 
@@ -38,6 +38,7 @@
 #define GES_QUIT_TIME			1000
 
 paj7620 Gesture;
+
 void setup() {
     Serial.begin(9600);
     Serial.println("\nPAJ7620U2 TEST DEMO: Recognize 9 gestures.");
