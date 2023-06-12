@@ -4,7 +4,7 @@
 
     Copyright (c) 2023 seeed technology inc.
     Website    : www.seeed.cc
-    Author     : Jx.Weng
+    Author     : JX.Weng
     Modified Time: June 2023
 
     The MIT License (MIT)
@@ -59,24 +59,27 @@ uint8_t Pixart_Gesture::readReg(uint8_t addr) {
     return values;
 }
 
+// PAJ7620U2 Gesture Sensor
+
 bool paj7620::init()
 {   
-    delay(10);
+    /* begin I2C and wakeup sensor */
     Wire.begin();
-    writeReg(0xff, 0x00);  //wakeup
+    delay(10);
+    writeReg(0xff, 0x00);
     delay(50);
-
+    /* check ID */
     if((readReg(0x00) != 0x20) || (readReg(0x01) != 0x76))
         return false;
-    delay(10);
+    /* Load the configuration data */
     for(uint8_t i = 0; i < INIT_REG_ARRAY_SIZE; i++)
         writeReg(initRegisterArray[i][0], initRegisterArray[i][1]);
-    
+    /* Set report mode to Gesture */
     setReportMode(NEAR_240FPS);
     return true;
 }
 
-bool paj7620::getResult(paj7620_gesture_t& out)
+bool paj7620::getResult(paj7620_gesture_t& res)
 {
     uint16_t gesture_code;
     gesture_code = (readReg(PAJ7620_REG_RESULT_H)<<8) + readReg(PAJ7620_REG_RESULT_L);
@@ -84,7 +87,7 @@ bool paj7620::getResult(paj7620_gesture_t& out)
     for (uint8_t i = UP; i < PAJ7620_GESTURE_COUNT; i++)
     {
         if (gesture_code == (1 << i)) {
-            out = (paj7620_gesture_t)i;
+            res = (paj7620_gesture_t)i;
             readReg(PAJ7620_REG_RESULT_H);
             readReg(PAJ7620_REG_RESULT_L);
             return true;
@@ -124,6 +127,8 @@ bool paj7620::setReportMode(uint8_t reportMode) {
 }
 
 
+// PAG7660 Gesture Sensor
+
 bool pag7660::init() {
     const uint8_t regs[][2] = {
         { 0x10, 0x04 },        // Set operation to gesture mode
@@ -139,6 +144,14 @@ bool pag7660::init() {
         writeReg(regs[i][0], regs[i][1]);
         delay(10);
     }
+    return true;
+}
+
+bool pag7660::getResult(pag7660_gesture_t& res) {
+    pag7660_out_t out;
+    if (!getOutput(out))
+        return false;
+    res = out.result;
     return true;
 }
 
@@ -167,23 +180,55 @@ int pag7660::nextGestureMode() {
     return gestureMode;
 }
 
-bool pag7660::getGestureOutput(gesture_out_t& out) {
+bool pag7660::getOutput(pag7660_out_t& out) {
     /* Check frame ready */
-    if (!checkReady())
+    if (!(readReg(0x04) & 0x02))
         return false;
     /* Read gesture output */
-    gesture_reg_out_t reg;
+    pag7660_reg_out_t reg;
     readRegs(0x3c, (uint8_t *)&reg, sizeof(reg));
-    out = toGesture(reg);
+    out = regToOutput(reg);
     /* Clear frame ready */
-    clearReady();
+    writeReg(0x04, 0x00);
     return true;
 }
 
-bool pag7660::checkReady() {
-    return readReg(0x04) & 0x02;
-}
-
-void pag7660::clearReady() {
-    writeReg(0x04, 0x00);
+pag7660_out_t pag7660::regToOutput(const pag7660_reg_out_t& reg) {
+    pag7660_out_t out;
+    /* Reset gesture output */
+    memset(&out, 0, sizeof(out));
+    /* Read palm */
+    if (reg.valid.palm) {
+        out.palm.valid = true;
+        out.palm.x = reg.palm.x | BIT8(reg.bit8[0].palm);
+        out.palm.y = reg.palm.y | BIT8(reg.bit8[1].palm);
+        out.palm.r = reg.palm.r;
+        out.palm.b = reg.palm.b;
+    }
+    /* Read tips */
+    if (reg.valid.tips) {
+        for (int i = 0; i < GESTURE_MAX_TIPS; i++) {
+            if (IS_VALID_TIP(reg.valid.tips, i)) {
+                out.tips[out.num_of_tips].x = reg.tips[i].x | BIT8(IS_VALID_TIP(reg.bit8[0].tips, i));
+                out.tips[out.num_of_tips].y = reg.tips[i].y | BIT8(IS_VALID_TIP(reg.bit8[1].tips, i));
+                out.tips[out.num_of_tips].b = reg.tips[i].b;
+                out.tips[out.num_of_tips].id = reg.tips[i].id;
+                out.num_of_tips++;
+            }
+        }
+    }
+    /* Read result */
+    out.result.type = reg.result.ges.gesture_type;
+    out.result.rotate = reg.result.ang_acc;
+    out.result.zoom = reg.result.ges.zoom;
+    out.result.thumb.up = reg.result.ges.thumb_up;
+    out.result.thumb.down = reg.result.ges.thumb_down;
+    out.result.cursor.type = reg.result.ges.cursor_type;
+    out.result.cursor.select = reg.result.ges.select;
+    out.result.cursor.x = reg.result.ges.cursor_x | BIT8_10(reg.result.cursor_hb.x);
+    out.result.cursor.y = reg.result.ges.cursor_y | BIT8_10(reg.result.cursor_hb.y);
+    out.result.crop.binning = reg.result.crop.binning;
+    out.result.crop.x = reg.result.crop.x;
+    out.result.crop.y = reg.result.crop.y;
+    return out;
 }

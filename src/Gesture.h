@@ -24,7 +24,7 @@ class paj7620 : public Pixart_Gesture
          i2c_addr = PAJ7620_I2C_ADDR; 
       };
       bool init();
-      bool getResult(paj7620_gesture_t& out);
+      bool getResult(paj7620_gesture_t& res);
 
    private:
       bool setReportMode(uint8_t reportMode);
@@ -39,13 +39,13 @@ class pag7660 : public Pixart_Gesture
          gestureMode = mode;
       };
       bool init();
-      bool getResult(gesture_out_t& out);
+      bool getResult(pag7660_gesture_t& res);
+      bool getOutput(pag7660_out_t& out);
 
       int getGestureMode();
       int nextGestureMode();
 
    private:
       uint8_t gestureMode;
-      bool checkReady();
-      void clearReady();
+      pag7660_out_t regToOutput(const pag7660_reg_out_t& reg);
 };
