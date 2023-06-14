@@ -34,17 +34,13 @@ void Pixart_Gesture::writeReg(uint8_t addr, uint8_t value) {
     Wire.beginTransmission(i2c_addr);
     Wire.write(addr);
     Wire.write(value);
-    if (0 != Wire.endTransmission()) {
-        Serial.print("Transmission error!!!\n");
-    }
+    Wire.endTransmission();
 }
 
 void Pixart_Gesture::readRegs(uint8_t addr, uint8_t *values, int size) {
     Wire.beginTransmission(i2c_addr);
     Wire.write(addr);
-    if (0 != Wire.endTransmission()) {
-        Serial.print("Transmission error!!!\n");
-    }
+    Wire.endTransmission();
 
     Wire.requestFrom((int)i2c_addr, (int)size);
     while (Wire.available()) {
@@ -63,15 +59,15 @@ uint8_t Pixart_Gesture::readReg(uint8_t addr) {
 
 bool paj7620::init()
 {   
-    /* begin I2C and wakeup sensor */
+    i2c_addr = PAJ7620_I2C_ADDR;
     Wire.begin();
     delay(10);
     writeReg(0xff, 0x00);
     delay(50);
     /* check ID */
-    if((readReg(0x00) != 0x20) || (readReg(0x01) != 0x76))
+    if((readReg(0x01) != 0x76) || (readReg(0x00) != 0x20))
         return false;
-    /* Load the configuration data */
+    /* Load the registers data */
     for(uint8_t i = 0; i < INIT_REG_ARRAY_SIZE; i++)
         writeReg(initRegisterArray[i][0], initRegisterArray[i][1]);
     /* Set report mode to Gesture */
@@ -130,20 +126,34 @@ bool paj7620::setReportMode(uint8_t reportMode) {
 // PAG7660 Gesture Sensor
 
 bool pag7660::init() {
+#ifdef PAG7660_CS
+    SPI.begin();
+    pinMode(PAG7660_CS, OUTPUT);
+    digitalWrite(PAG7660_CS, HIGH);
+#else
+    i2c_addr = PAG7660_I2C_ADDR;
+    Wire.begin();
+#endif
+    delay(50);
     const uint8_t regs[][2] = {
         { 0x10, 0x04 },        // Set operation to gesture mode
         { 0x22, gestureMode }, // Set gesture mode
         { 0x0A, 0x01 },        // enable cpu
     };
+    /* check ID */
     uint16_t id;
     id = (readReg(1) << 8) | readReg(0);
-    if (id != PAG7660_ID)
+    if (id != 0x7660) {
+        Serial.print("check id failed: ");
+        Serial.println(id);
         return false;
-    
+    }
+    /* Load the registers data */
     for (int i = 0; i < sizeof(regs)/2; i++) {
         writeReg(regs[i][0], regs[i][1]);
         delay(10);
     }
+    delay(250);
     return true;
 }
 
@@ -232,3 +242,30 @@ pag7660_out_t pag7660::regToOutput(const pag7660_reg_out_t& reg) {
     out.result.crop.y = reg.result.crop.y;
     return out;
 }
+
+#ifdef PAG7660_CS
+
+void pag7660::writeReg(uint8_t addr, uint8_t value) {
+    digitalWrite(PAG7660_CS, LOW);
+    SPI.transfer(addr & 0x7f);
+    SPI.transfer(values);
+    digitalWrite(PAG7660_CS, HIGH);
+}
+
+void pag7660::readRegs(uint8_t addr, uint8_t *values, int size) {
+    digitalWrite(PAG7660_CS, LOW);
+    SPI.transfer(addr | 0x80);
+    while (size--) {
+        *values = SPI.transfer(0x00);
+        values++;
+    }
+    digitalWrite(PAG7660_CS, HIGH);
+}
+
+uint8_t pag7660::readReg(uint8_t addr) {
+    uint8_t values;
+    readRegs(addr, &values, 1);
+    return values;
+}
+
+#endif
