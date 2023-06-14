@@ -2,7 +2,7 @@
     paj7620.h
     A library for Grove-Gesture 1.0
 
-    Copyright (c) 2015 seeed technology inc.
+    Copyright (c) 2023 seeed technology inc.
     Website    : www.seeed.cc
     Author     : Wuruibin & Xiangnan
     Modified Time: June 2023
@@ -63,12 +63,5 @@ const uint8_t initRegisterArray[][2] = {
     {0x6E,0x01}, {0x72,0x01}, {0x73,0x35}, {0x77,0x01}, {0xEF,0x00},
 };
 #define INIT_REG_ARRAY_SIZE (sizeof(initRegisterArray)/sizeof(initRegisterArray[0]))
-
-
-uint8_t paj7620Init(void);
-uint8_t paj7620WriteReg(uint8_t addr, uint8_t cmd);
-uint8_t paj7620ReadReg(uint8_t addr, uint8_t qty, uint8_t data[]);
-void setReportMode(uint8_t reportMode);
-
 
 #endif

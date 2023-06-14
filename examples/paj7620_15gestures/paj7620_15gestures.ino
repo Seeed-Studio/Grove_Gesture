@@ -41,6 +41,9 @@ paj7620 Gesture;
 
 void setup() {
     Serial.begin(9600);
+    while(!Serial) {
+        delay(100);
+    }
     Serial.println("\nPAJ7620U2 TEST DEMO: Recognize 9 gestures.");
     if(Gesture.init()) {
         Serial.println("PAJ7620U2 initialization failed");

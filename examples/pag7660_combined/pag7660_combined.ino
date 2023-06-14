@@ -32,11 +32,14 @@ pag7660 Gesture; // Combined mode is used by default
 
 void setup() {
     Serial.begin(9600);
+    while(!Serial) {
+        delay(100);
+    }
     Serial.println("\nPAG7660 TEST DEMO: Gesture combined mode.");
     if(Gesture.init()) {
-        Serial.println("PAG7660 initialization failed");
-    } else {
         Serial.println("PAG7660 initialization success");
+    } else {
+        Serial.println("PAG7660 initialization failed");
     }
     Serial.println("Please put your hand in front of sensor:\n");
 }
@@ -44,13 +47,12 @@ void setup() {
 void loop() {
     pag7660_gesture_t result;
     if (Gesture.getResult(result)) {
-        Serial.print("Gesture: ");
-        Serial.println(getResultCombinedMode(result));
+        printResultCombinedMode(result);
     }
+    delay(100);
 }
 
-char* getResultCombinedMode(const pag7660_gesture_t& result) {
-    char _result_str[32];
+void printResultCombinedMode(const pag7660_gesture_t& result) {
     const char *cursor_str[] = {
         NULL,
         "Tap",
@@ -64,10 +66,9 @@ char* getResultCombinedMode(const pag7660_gesture_t& result) {
         case 2:
         case 3:
             if (result.cursor.select)
-                strcpy(_result_str, cursor_str[result.cursor.type]);
+                Serial.println(cursor_str[result.cursor.type]);
             break;
         default:
-            strcpy(_result_str, "");
             break;
         }
         break;
@@ -76,30 +77,32 @@ char* getResultCombinedMode(const pag7660_gesture_t& result) {
     case 3:
     case 4:
     case 5:
-        sprintf(_result_str, "%d-finger", result.type);
+        Serial.print(result.type);
+        Serial.println("-finger");
         break;
     case 6:
-        sprintf(_result_str, "Rotate Right %d", result.rotate);
+        Serial.print("Rotate Right ");
+        Serial.println(result.rotate);
         break;
     case 7:
-        sprintf(_result_str, "Rotate Left %d", result.rotate);
+        Serial.print("Rotate Left ");
+        Serial.println(result.rotate);
         break;
     case 8:
-        strcpy(_result_str, "Swipe Left");
+        Serial.println("Swipe Left");
         break;
     case 9:
-        strcpy(_result_str, "Swipe Right");
+        Serial.println("Swipe Right");
         break;
     case 19:
     case 20:
     case 21:
     case 22:
     case 23:
-        sprintf(_result_str, "%d-finger push", result.type - 19 + 1);
+        Serial.print(result.type - 19 + 1);
+        Serial.println("-finger push");
         break;
     default:
-        strcpy(_result_str, "");
         break;
     }
-    return _result_str;
 }

@@ -32,11 +32,14 @@ pag7660 Gesture(GESTURE_THUMB_MODE); // Thumb mode is used
 
 void setup() {
     Serial.begin(9600);
+    while(!Serial) {
+        delay(100);
+    }
     Serial.println("\nPAG7660 TEST DEMO: Gesture thumb mode.");
     if(Gesture.init()) {
-        Serial.println("PAG7660 initialization failed");
-    } else {
         Serial.println("PAG7660 initialization success");
+    } else {
+        Serial.println("PAG7660 initialization failed");
     }
     Serial.println("Please put your hand in front of sensor:\n");
 }
@@ -44,16 +47,10 @@ void setup() {
 void loop() {
     pag7660_gesture_t result;
     if (Gesture.getResult(result)) {
-        Serial.print("Gesture: ");
-        Serial.println(getResultThumbMode(result));
-    }
-}
-
-char* getResultThumbMode(const pag7660_gesture_t& result) {
-    char _result_str[32];
-    if (result.thumb.up)
-        sprintf(_result_str, "Thumb Up");
-    else if (result.thumb.down)
-        sprintf(_result_str, "Thumb Down");
-    return _result_str;
+        if (result.thumb.up)
+            Serial.println("Thumb Up");
+        else if (result.thumb.down)
+            Serial.println("Thumb Down");
+        }
+    delay(100);
 }
