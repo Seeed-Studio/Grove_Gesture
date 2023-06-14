@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015 seeed technology inc.
+    Copyright (c) 2023 seeed technology inc.
     Website    : www.seeed.cc
     Author     : Wuruibin
     Modified Time: June 2023
