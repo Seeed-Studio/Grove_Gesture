@@ -31,21 +31,36 @@
 #include "Gesture.h"
 
 void Pixart_Gesture::writeReg(uint8_t addr, uint8_t value) {
-    Wire.beginTransmission(i2c_addr);
-    Wire.write(addr);
-    Wire.write(value);
-    Wire.endTransmission();
+    if(spi_cs != GESTURE_SPI_USELESS) {
+        digitalWrite(spi_cs, LOW);
+        SPI.transfer(addr & 0x7f);
+        SPI.transfer(value);
+        digitalWrite(spi_cs, HIGH);
+    } else {
+        Wire.beginTransmission(i2c_addr);
+        Wire.write(addr);
+        Wire.write(value);
+        Wire.endTransmission();
+    }
 }
 
 void Pixart_Gesture::readRegs(uint8_t addr, uint8_t *values, int size) {
-    Wire.beginTransmission(i2c_addr);
-    Wire.write(addr);
-    Wire.endTransmission();
-
-    Wire.requestFrom((int)i2c_addr, (int)size);
-    while (Wire.available()) {
-        *values = Wire.read();
-        values++;
+    if(spi_cs != GESTURE_SPI_USELESS) {
+        digitalWrite(spi_cs, LOW);
+        SPI.transfer(addr | 0x80);
+        for(int i = 0; i < size; i++) {
+            values[i] = SPI.transfer(0x00);
+        }
+        digitalWrite(spi_cs, HIGH);
+    } else {
+        Wire.beginTransmission(i2c_addr);
+        Wire.write(addr);
+        Wire.endTransmission();
+        Wire.requestFrom((int)i2c_addr, (int)size);
+        while (Wire.available()) {
+            *values = Wire.read();
+            values++;
+        }
     }
 }
 
@@ -55,10 +70,11 @@ uint8_t Pixart_Gesture::readReg(uint8_t addr) {
     return values;
 }
 
-// PAJ7620U2 Gesture Sensor
+/********************** PAJ7620 Gesture Sensor **********************/
 
 bool paj7620::init()
 {   
+    spi_cs = GESTURE_SPI_USELESS;
     i2c_addr = PAJ7620_I2C_ADDR;
     Wire.begin();
     delay(10);
@@ -122,18 +138,20 @@ bool paj7620::setReportMode(uint8_t reportMode) {
     return true;
 }
 
+/********************** PAG7660 Gesture Sensor **********************/
 
-// PAG7660 Gesture Sensor
+bool pag7660::init(uint8_t cs = GESTURE_SPI_USELESS) {
+    spi_cs = cs;
+    if(spi_cs != GESTURE_SPI_USELESS) {
+        SPI.begin();
+        pinMode(spi_cs, OUTPUT);
+        digitalWrite(spi_cs, HIGH);
+        Serial.println("PAG7660: Use SPI for transfer");
+    } else {
+        i2c_addr = PAG7660_I2C_ADDR;
+        Wire.begin();
+    }
 
-bool pag7660::init() {
-#ifdef PAG7660_CS
-    SPI.begin();
-    pinMode(PAG7660_CS, OUTPUT);
-    digitalWrite(PAG7660_CS, HIGH);
-#else
-    i2c_addr = PAG7660_I2C_ADDR;
-    Wire.begin();
-#endif
     delay(50);
     const uint8_t regs[][2] = {
         { 0x10, 0x04 },        // Set operation to gesture mode
@@ -242,30 +260,3 @@ pag7660_out_t pag7660::regToOutput(const pag7660_reg_out_t& reg) {
     out.result.crop.y = reg.result.crop.y;
     return out;
 }
-
-#ifdef PAG7660_CS
-
-void pag7660::writeReg(uint8_t addr, uint8_t value) {
-    digitalWrite(PAG7660_CS, LOW);
-    SPI.transfer(addr & 0x7f);
-    SPI.transfer(values);
-    digitalWrite(PAG7660_CS, HIGH);
-}
-
-void pag7660::readRegs(uint8_t addr, uint8_t *values, int size) {
-    digitalWrite(PAG7660_CS, LOW);
-    SPI.transfer(addr | 0x80);
-    while (size--) {
-        *values = SPI.transfer(0x00);
-        values++;
-    }
-    digitalWrite(PAG7660_CS, HIGH);
-}
-
-uint8_t pag7660::readReg(uint8_t addr) {
-    uint8_t values;
-    readRegs(addr, &values, 1);
-    return values;
-}
-
-#endif
