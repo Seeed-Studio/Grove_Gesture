@@ -36,12 +36,13 @@ void setup() {
         delay(100);
     }
     Serial.println("\nPAG7660 TEST DEMO: Gesture combined mode.");
+    
     if(Gesture.init()) {
         Serial.println("PAG7660 initialization success");
     } else {
         Serial.println("PAG7660 initialization failed");
     }
-    Serial.println("Please put your hand in front of sensor:\n");
+    Serial.println("Please input your gestures:\n");
 }
 
 void loop() {

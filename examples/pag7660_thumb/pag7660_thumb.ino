@@ -28,6 +28,7 @@
 
 #include "Gesture.h"
 
+#define PAG7660_CS D3
 pag7660 Gesture(GESTURE_THUMB_MODE); // Thumb mode is used
 
 void setup() {
@@ -36,12 +37,14 @@ void setup() {
         delay(100);
     }
     Serial.println("\nPAG7660 TEST DEMO: Gesture thumb mode.");
-    if(Gesture.init()) {
+
+    // initialize with a SPI chip select pin number to use SPI
+    if(Gesture.init(PAG7660_CS)) {
         Serial.println("PAG7660 initialization success");
     } else {
         Serial.println("PAG7660 initialization failed");
     }
-    Serial.println("Please put your hand in front of sensor:\n");
+    Serial.println("Please input your gestures:\n");
 }
 
 void loop() {
