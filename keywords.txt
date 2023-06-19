@@ -1,22 +1,31 @@
   
 #######################################
 # Syntax Coloring Map For Grove - 
-# Gesture（PAJ7620U2）
+# Gesture（PAJ7620U2）and Smart IR Gesture
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
+paj7620 KEYWORD1
+paj7620_gesture_t KEYWORD1
 
+pag7660 KEYWORD1
+pag7660_gesture_t KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-paj7620Init	KEYWORD2
-paj7620WriteReg	KEYWORD2
-paj7620ReadReg	KEYWORD2
-paj7620SelectBank	KEYWORD2
+init      KEYWORD2
+getResult KEYWORD2
+
+getOutput KEYWORD2
+getGestureMode KEYWORD2
+nextGestureMode KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+GESTURE_THUMB_MODE LITERAL1
+GESTURE_CURSOR_MODE LITERAL1
+GESTURE_COMBINED_MODE LITERAL1
