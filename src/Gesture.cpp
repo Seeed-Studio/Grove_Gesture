@@ -140,7 +140,7 @@ bool paj7620::setReportMode(uint8_t reportMode) {
 
 /********************** PAG7660 Gesture Sensor **********************/
 
-bool pag7660::init(uint8_t cs = GESTURE_SPI_USELESS) {
+bool pag7660::init(uint8_t cs) {
     spi_cs = cs;
     if(spi_cs != GESTURE_SPI_USELESS) {
         SPI.begin();

@@ -36,7 +36,7 @@ class pag7660 : public Pixart_Gesture
       pag7660(int mode = GESTURE_COMBINED_MODE) {
          gestureMode = mode;
       };
-      bool init(uint8_t cs);
+      bool init(uint8_t cs = GESTURE_SPI_USELESS);
       bool getResult(pag7660_gesture_t& res);
       bool getOutput(pag7660_out_t& out);
 
