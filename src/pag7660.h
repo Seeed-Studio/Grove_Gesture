@@ -35,6 +35,7 @@
 #include <stdint.h>
 
 #define PAG7660_I2C_ADDR    0x68
+#define PAG7660_I2C_ADDR2   0x60
 #define PAG7660_WIDTH       400
 #define PAG7660_HEIGHT      400
 
