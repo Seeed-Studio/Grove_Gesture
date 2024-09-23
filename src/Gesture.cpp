@@ -148,7 +148,6 @@ bool pag7660::init(uint8_t cs) {
         digitalWrite(spi_cs, HIGH);
         Serial.println("PAG7660: Use SPI for transfer");
     } else {
-        i2c_addr = PAG7660_I2C_ADDR;
         Wire.begin();
     }
 
