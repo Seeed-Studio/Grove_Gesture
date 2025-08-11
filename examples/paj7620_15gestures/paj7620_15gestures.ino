@@ -46,7 +46,7 @@ void setup() {
     }
     Serial.println("\nPAJ7620U2 TEST DEMO: Recognize 15 gestures.");
     
-    if(Gesture.init()) {
+    if(!Gesture.init()) {
         Serial.println("PAJ7620U2 initialization failed");
     } else {
         Serial.println("PAJ7620U2 initialization success");
